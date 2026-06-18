@@ -1,0 +1,20 @@
+data/candidates.jsonl
+data/embeddings.npy
+data/jd_embedding.npy
+data/candidate_ids.json
+data/embedding_meta.json
+output/
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+# Conda/venv
+.env
+*.egg-info/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
