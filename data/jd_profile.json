@@ -1,0 +1,67 @@
+{
+  "role_title": "Senior AI Engineer - Founding Team",
+  "company": "Redrob AI",
+  "jd_semantic_text": "Senior AI Engineer owning ranking, retrieval, and matching systems for a recruiting platform. Production experience with embeddings-based retrieval (sentence-transformers, OpenAI embeddings, BGE, E5), hybrid search and vector databases (Pinecone, Weaviate, Qdrant, Milvus, OpenSearch, Elasticsearch, FAISS). Strong Python, production ML systems. Designs evaluation frameworks for ranking: NDCG, MRR, MAP, offline-to-online correlation, A/B testing. Has shipped an end-to-end ranking, search, or recommendation system to real users at meaningful scale at a product company. Comfortable with LLM integration, fine-tuning, learning-to-rank models.",
+
+  "experience_years_min": 4,
+  "experience_years_ideal_min": 5,
+  "experience_years_ideal_max": 9,
+  "experience_years_hard_floor": 3,
+
+  "preferred_titles_keywords": [
+    "ai engineer", "ml engineer", "machine learning engineer", "applied scientist",
+    "research engineer", "data scientist", "search engineer", "recommendation",
+    "nlp engineer", "ranking", "retrieval", "senior software engineer", "staff engineer",
+    "ai/ml", "deep learning engineer"
+  ],
+
+  "negative_titles_keywords": [
+    "marketing manager", "hr manager", "business analyst", "graphic designer",
+    "accountant", "civil engineer", "mechanical engineer", "content writer",
+    "sales", "recruiter", "product manager", "operations"
+  ],
+
+  "must_have_skill_groups": {
+    "embeddings_retrieval": ["embeddings", "sentence-transformers", "bge", "e5", "openai embeddings", "dense retrieval", "semantic search", "retrieval"],
+    "vector_db_hybrid_search": ["pinecone", "weaviate", "qdrant", "milvus", "opensearch", "elasticsearch", "faiss", "vector database", "hybrid search", "bm25"],
+    "python": ["python"],
+    "ranking_eval": ["ndcg", "mrr", "map", "learning to rank", "a/b testing", "offline evaluation", "ranking evaluation", "precision@k", "recall@k"]
+  },
+
+  "nice_to_have_skills": [
+    "lora", "qlora", "peft", "fine-tuning llms", "xgboost", "learning to rank",
+    "distributed systems", "large-scale inference", "open source", "hr-tech", "recommendation systems"
+  ],
+
+  "core_ai_keywords_for_trap_detection": [
+    "rag", "pinecone", "langchain", "llm", "embeddings", "vector database",
+    "fine-tuning", "transformers", "nlp", "retrieval", "prompt engineering",
+    "gpt", "openai", "huggingface", "bert", "weaviate", "qdrant", "faiss", "milvus"
+  ],
+
+  "research_only_red_flag_industries": ["academia", "research institute", "education"],
+  "research_only_red_flag_titles": ["research scientist", "research fellow", "phd researcher", "postdoc", "research associate"],
+
+  "consulting_companies": ["tcs", "infosys", "wipro", "accenture", "cognizant", "capgemini", "tata consultancy services"],
+
+  "tech_lead_no_code_titles": ["engineering manager", "vp engineering", "director of engineering", "head of engineering"],
+
+  "non_nlp_specialist_titles_keywords": ["computer vision engineer", "robotics engineer", "speech engineer", "embedded engineer", "hardware engineer"],
+
+  "preferred_locations_india": ["pune", "noida", "delhi", "delhi ncr", "gurugram", "gurgaon", "hyderabad", "mumbai", "bangalore", "bengaluru"],
+  "preferred_country": "india",
+
+  "ideal_notice_period_days": 30,
+
+  "weights": {
+    "semantic_similarity": 0.30,
+    "title_seniority_fit": 0.20,
+    "must_have_skills_coverage": 0.20,
+    "experience_fit": 0.10,
+    "location_fit": 0.05,
+    "career_trajectory_penalty": 0.10,
+    "skill_trust_quality": 0.05
+  },
+
+  "behavioral_signal_weight": 0.25
+}
