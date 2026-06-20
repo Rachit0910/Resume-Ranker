@@ -198,7 +198,7 @@ def main():
         writer.writerow(["candidate_id", "rank", "score", "reasoning"])
         for rank, r in enumerate(top, start=1):
             reasoning = build_reasoning(r["candidate"], r["scores"], r["honeypot_flags"])
-            writer.writerow([r["candidate_id"], rank, f"{r['score']:.4f}", reasoning])
+            writer.writerow([r["candidate_id"], rank, f"{r['score']:.6f}", reasoning])
 
     elapsed = time.time() - t0
     print(f"[rank] wrote {args.out} ({len(top)} rows) in {elapsed:.1f}s total")
