@@ -1,0 +1,82 @@
+# ============================================================================
+# Team identity
+# ============================================================================
+team_name: "Jujutsu Coders"
+
+primary_contact:
+  name: "Rachit Mishra"
+  email: "rachitmishra0910@gmail.com"
+  phone: "+91-8881928459"
+
+team_members:
+  - name: "Rachit Mishra"
+    email: "rachitmishra0910@gmail.com"
+    role: "ML Engineer"
+
+# ============================================================================
+# Code and reproducibility
+# ============================================================================
+github_repo: "https://github.com/Rachit0910/Resume-Ranker"
+
+sandbox_link: "https://resume-ranker-trm3isrjry53ybmvivwazr.streamlit.app/"
+
+reproduce_command: "python src/rank.py --candidates data/candidates.jsonl --out output/submission.csv"
+
+# ============================================================================
+# Compute environment
+# ============================================================================
+compute:
+  platform: "Windows laptop"
+  cpu_cores: 10
+  ram_gb: 8
+  python_version: "3.11.15"
+  os: "Windows 11"
+  uses_gpu_for_inference: false
+  has_network_during_ranking: false
+  pre_computation_required: true
+  pre_computation_time_minutes: 67
+
+# ============================================================================
+# AI tools declaration
+# ============================================================================
+ai_tools_used:
+  - "Claude"
+
+ai_usage_summary: |
+  Used Claude for debugging errors during development (e.g. git/conda setup
+  issues, environment configuration, fixing the tie-breaking validation
+  error in rank.py, fixing a score-scaling bug in the Streamlit sandbox).
+  No candidate data was shared with any external LLM API during scoring —
+  Claude was used only during development for debugging support, not at
+  ranking runtime.
+# ============================================================================
+# Approach summary
+# ============================================================================
+methodology_summary: |
+  Two-phase pipeline. Phase 1 (offline, untimed): candidate profiles are
+  converted to short text blobs and embedded using sentence-transformers
+  (all-MiniLM-L6-v2); JD requirements text is embedded the same way.
+  Phase 2 (CPU-only, no network, <5 min): each candidate is scored on
+  semantic similarity (precomputed embedding cosine sim), title/seniority
+  fit, must-have skill coverage (weighted by proficiency, duration,
+  endorsements, and platform assessment scores to penalize keyword
+  stuffing), experience fit, location fit, and nice-to-have skills.
+  A multiplicative career-trajectory penalty down-weights research-only,
+  consulting-only, title-chasing, and no-recent-code patterns. A behavioral
+  signal multiplier (from redrob_signals) adjusts for activity recency,
+  recruiter response rate, interview completion rate, and notice period.
+  A honeypot penalty flags internally inconsistent profiles (e.g. expert
+  skill with near-zero duration, experience/history mismatch). Final score
+  is the weighted sum of fit components, multiplied by the trajectory,
+  behavioral, and honeypot penalties. Runtime is ~78 seconds for 100K
+  candidates on a CPU-only Windows laptop, well under the 5-minute budget.
+
+# ============================================================================
+# Declarations
+# ============================================================================
+declarations:
+  read_submission_spec: true
+  code_is_original_work: true
+  no_collusion: true
+  honeypot_check_done: true
+  reproduction_tested: true
