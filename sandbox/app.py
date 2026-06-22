@@ -373,30 +373,50 @@ if run:
             <span class="pill">behav {r['behavioral_mult']}</span>
             """
 
-            st.markdown(f"""
-            <div class="rank-card">
-                <div style="display:flex; align-items:center;">
-                    <span class="rank-badge {badge_class}">#{rank}</span>
-                    <div style="flex:1">
-                        <div class="candidate-title">
-                            {r['title']}
-                            {hp_html}{concern_html}
-                        </div>
-                        <div class="candidate-meta">
-                            {r['candidate_id']} &nbsp;·&nbsp; {r['years_exp']} yrs &nbsp;·&nbsp; {r['location']}
-                        </div>
-                        <div style="margin-top:0.5rem">{pills}</div>
-                    </div>
-                    <div style="text-align:right; min-width:70px">
-                        <div style="font-size:1.3rem; font-weight:800; color:#60a5fa">{r['score']:.4f}</div>
-                        <div style="font-size:0.75rem; color:#64748b">score</div>
-                    </div>
-                </div>
-                <div class="score-bar-bg">
-                    <div class="score-bar-fill" style="width:{score_pct}%"></div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+        for i, r in enumerate(results[:15]):
+            rank = i + 1
+            score_pct = int(r["score"] * 100)
+
+            if rank == 1:
+              badge_class = "gold"
+            elif rank == 2:
+              badge_class = "silver"
+            elif rank == 3:
+              badge_class = "bronze"
+            else:
+              badge_class = ""
+
+            hp_html = '<span class="flag-badge">⚠ honeypot flag</span>' if r["honeypot_flags"] else ""
+            concern_html = f'<span class="concern-badge">⚡ {", ".join(r["trajectory_flags"]).replace("_"," ")}</span>' if r["trajectory_flags"] else ""
+
+            pills = "".join([
+            f'<span class="pill">title {r["title_fit"]}</span>',
+            f'<span class="pill">skills {r["skill_coverage"]}</span>',
+            f'<span class="pill">exp {r["experience_fit"]}</span>',
+            f'<span class="pill">loc {r["location_fit"]}</span>',
+            f'<span class="pill">behav {r["behavioral_mult"]}</span>',
+            ])
+
+            html = (
+            f'<div class="rank-card">'
+            f'<div style="display:flex;align-items:center;">'
+            f'<span class="rank-badge {badge_class}">#{rank}</span>'
+            f'<div style="flex:1">'
+            f'<div class="candidate-title">{r["title"]}{hp_html}{concern_html}</div>'
+            f'<div class="candidate-meta">{r["candidate_id"]} &middot; {r["years_exp"]} yrs &middot; {r["location"]}</div>'
+            f'<div style="margin-top:0.5rem">{pills}</div>'
+            f'</div>'
+            f'<div style="text-align:right;min-width:70px">'
+            f'<div style="font-size:1.3rem;font-weight:800;color:#60a5fa">{r["score"]:.4f}</div>'
+            f'<div style="font-size:0.75rem;color:#64748b">score</div>'
+            f'</div>'
+            f'</div>'
+            f'<div class="score-bar-bg">'
+            f'<div class="score-bar-fill" style="width:{score_pct}%"></div>'
+            f'</div>'
+            f'</div>'
+            )
+            st.markdown(html, unsafe_allow_html=True)
 
     with tab2:
         table_data = [{
