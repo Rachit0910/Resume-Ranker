@@ -1,24 +1,9 @@
-"""
-rank.py
-The ranking step. Must satisfy: <=5 min wall clock, <=16GB RAM, CPU only, no network.
-
-Reads:
-  - candidates.jsonl(.gz)
-  - data/jd_profile.json
-  - data/embeddings.npy, data/jd_embedding.npy, data/candidate_ids.json  (precomputed)
-
-Writes:
-  - output/submission.csv  (candidate_id, rank, score, reasoning)
-
-Usage:
-  python src/rank.py --candidates data/candidates.jsonl --out output/submission.csv
-"""
-
 import argparse
 import json
 import os
 import sys
 import time
+import csv
 
 import numpy as np
 
@@ -37,12 +22,8 @@ from features import (
 from precompute import load_candidates
 
 
-def load_jsonl_or_gz(path):
-    return load_candidates(path)
-
-
 def cosine_sim_batch(cand_emb, jd_emb):
-    # embeddings assumed pre-normalized; if not, normalize here
+    # ek hi matrix multiply se saare 100K candidates ki similarity nikal lo
     norms = np.linalg.norm(cand_emb, axis=1, keepdims=True)
     norms[norms == 0] = 1.0
     cand_norm = cand_emb / norms
@@ -51,6 +32,7 @@ def cosine_sim_batch(cand_emb, jd_emb):
 
 
 def build_reasoning(candidate, scores, flags):
+    # actual candidate fields se reasoning banata hai, templated nahi hai
     profile = candidate["profile"]
     title = profile.get("current_title", "Unknown role")
     yoe = profile.get("years_of_experience", 0)
@@ -105,11 +87,11 @@ def main():
     with open(args.jd_profile) as f:
         jd = json.load(f)
 
-    print("[rank] loading candidates...")
-    candidates = load_jsonl_or_gz(args.candidates)
-    print(f"[rank] loaded {len(candidates)} candidates in {time.time()-t0:.1f}s")
+    print("[rank] candidates load ho rahe hain...")
+    candidates = load_candidates(args.candidates)
+    print(f"[rank] {len(candidates)} candidates loaded in {time.time()-t0:.1f}s")
 
-    # embeddings (precomputed)
+    # precomputed embeddings load karo
     use_embeddings = (
         os.path.exists(args.embeddings)
         and os.path.exists(args.jd_embedding)
@@ -122,11 +104,12 @@ def main():
             emb_ids = json.load(f)
         emb_index = {cid: i for i, cid in enumerate(emb_ids)}
         sims = cosine_sim_batch(cand_emb, jd_emb)
-        sim_lookup = {cid: float((sims[i] + 1) / 2) for cid, i in emb_index.items()}  # rescale [-1,1] -> [0,1]
-        print(f"[rank] loaded precomputed embeddings ({cand_emb.shape})")
+        # [-1,1] se [0,1] range mein lao
+        sim_lookup = {cid: float((sims[i] + 1) / 2) for cid, i in emb_index.items()}
+        print(f"[rank] embeddings loaded {cand_emb.shape}")
     else:
         sim_lookup = {}
-        print("[rank] WARNING: no precomputed embeddings found, semantic score = 0.5 for all")
+        print("[rank] embeddings nahi mile, semantic score = 0.5 for all")
 
     w = jd["weights"]
     results = []
@@ -134,33 +117,33 @@ def main():
     for c in candidates:
         cid = c["candidate_id"]
 
-        semantic = sim_lookup.get(cid, 0.5)
-        title_fit = title_fit_score(c, jd)
-        exp_fit = experience_fit_score(c, jd)
-        skill_cov = must_have_skill_coverage(c, jd)
-        nice_to_have = nice_to_have_score(c, jd)
-        loc_fit = location_fit_score(c, jd)
+        semantic       = sim_lookup.get(cid, 0.5)
+        title_fit      = title_fit_score(c, jd)
+        exp_fit        = experience_fit_score(c, jd)
+        skill_cov      = must_have_skill_coverage(c, jd)
+        nice_to_have   = nice_to_have_score(c, jd)
+        loc_fit        = location_fit_score(c, jd)
         traj_penalty, traj_flags = career_trajectory_penalty(c, jd)
         behavioral_mult = behavioral_signal_multiplier(c)
-        hp_flags = honeypot_flags(c)
+        hp_flags       = honeypot_flags(c)
 
         base_score = (
-            w["semantic_similarity"] * semantic
-            + w["title_seniority_fit"] * title_fit
+            w["semantic_similarity"]         * semantic
+            + w["title_seniority_fit"]       * title_fit
             + w["must_have_skills_coverage"] * skill_cov
-            + w["experience_fit"] * exp_fit
-            + w["location_fit"] * loc_fit
-            + w["skill_trust_quality"] * nice_to_have
+            + w["experience_fit"]            * exp_fit
+            + w["location_fit"]              * loc_fit
+            + w["skill_trust_quality"]       * nice_to_have
         )
 
-        # career trajectory acts as a multiplicative penalty
+        # trajectory penalty multiplicative hai — ek bhi red flag score kaafi gira deta hai
         score = base_score * traj_penalty
 
-        # behavioral signal multiplier, dampened so it can't dominate skill fit
-        behavioral_weight = jd["behavioral_signal_weight"]
-        score = score * ((1 - behavioral_weight) + behavioral_weight * behavioral_mult)
+        # behavioral signal thoda dampened hai taaki skill fit dominate kare
+        bw = jd["behavioral_signal_weight"]
+        score = score * ((1 - bw) + bw * behavioral_mult)
 
-        # honeypot penalty
+        # honeypot profiles ka score bahut neeche gira do
         if hp_flags:
             score *= max(0.05, 1.0 - 0.35 * len(hp_flags))
 
@@ -184,15 +167,13 @@ def main():
             "honeypot_flags": hp_flags,
         })
 
-    print(f"[rank] scored all candidates in {time.time()-t0:.1f}s")
+    print(f"[rank] scoring done in {time.time()-t0:.1f}s")
 
-    # sort: score desc, then candidate_id asc for ties
+    # score desc, tie mein candidate_id asc
     results.sort(key=lambda r: (-r["score"], r["candidate_id"]))
-
     top = results[:args.top_n]
 
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
-    import csv
     with open(args.out, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["candidate_id", "rank", "score", "reasoning"])
@@ -201,10 +182,10 @@ def main():
             writer.writerow([r["candidate_id"], rank, f"{r['score']:.6f}", reasoning])
 
     elapsed = time.time() - t0
-    print(f"[rank] wrote {args.out} ({len(top)} rows) in {elapsed:.1f}s total")
+    print(f"[rank] {args.out} ready — {len(top)} rows in {elapsed:.1f}s")
 
     if elapsed > 300:
-        print("[rank] WARNING: exceeded 5-minute budget!", file=sys.stderr)
+        print("[rank] WARNING: 5 min budget exceed ho gaya!", file=sys.stderr)
 
 
 if __name__ == "__main__":
