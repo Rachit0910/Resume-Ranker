@@ -251,7 +251,21 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 # ---- JD expander ----
 with st.expander("📋 View Job Description (structured requirements)"):
-    st.json(jd)
+    col_a, col_b = st.columns(2)
+    with col_a:
+        st.markdown(f"**Role:** {jd['role_title']}")
+        st.markdown(f"**Company:** {jd['company']}")
+        st.markdown(f"**Experience:** {jd['experience_years_ideal_min']}–{jd['experience_years_ideal_max']} years (min {jd['experience_years_hard_floor']} yrs)")
+        st.markdown("**Must-have skill groups:**")
+        for group, keywords in jd["must_have_skill_groups"].items():
+            st.markdown(f"- `{group}`: {', '.join(keywords[:3])}...")
+    with col_b:
+        st.markdown("**Preferred locations:**")
+        st.markdown(", ".join(jd["preferred_locations_india"]))
+        st.markdown("**Preferred titles:**")
+        st.markdown(", ".join(jd["preferred_titles_keywords"][:6]) + "...")
+        st.markdown("**Disqualifiers:**")
+        st.markdown(", ".join(jd["consulting_companies"]) + " (consulting-only), research-only, non-NLP specialist")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
