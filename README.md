@@ -1,6 +1,6 @@
-# Redrob Hackathon — Intelligent Candidate Ranker
+ Intelligent Candidate Ranker
 
-Ranks 100,000 candidate profiles against a Senior AI Engineer JD for Redrob AI.
+Ranks 100,000 candidate profiles against a Senior AI Engineer JD .
 
 ## Approach
 
