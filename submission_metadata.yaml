@@ -11,7 +11,10 @@ primary_contact:
 team_members:
   - name: "Rachit Mishra"
     email: "rachitmishra0910@gmail.com"
-    role: "ML Engineer"
+    role: "ML Developer"
+  - name: "Raj Gupta"
+    email: "Raj9354761582@gmail.com"
+    role: "Designer"
 
 # ============================================================================
 # Code and reproducibility
