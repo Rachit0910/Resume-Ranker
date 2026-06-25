@@ -204,7 +204,7 @@ st.markdown("""
 # ---- header ----
 st.markdown("""
 <div class="main-header">
-    <h1>🎯 Redrob Candidate Ranker</h1>
+    <h1> Candidate Ranker</h1>
     <p>Intelligent candidate discovery — ranks the way a great recruiter actually thinks, not by keywords.</p>
 </div>
 """, unsafe_allow_html=True)
